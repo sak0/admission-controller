@@ -145,6 +145,8 @@ func (a *Admit) checkComponent(appConf *v1alpha1.ApplicationConfiguration) error
 	for _, v := range appConf.Spec.Components {
 		comp, err := a.componentInformer.Lister().ComponentSchematics(appConf.Namespace).Get(v.ComponentName)
 		if err != nil {
+			klog.Infof("namespace: %s comp: %s", appConf.Namespace, v.ComponentName)
+			klog.Infof("checkComponent err: %v", err)
 			return err
 		}
 		for _, p := range v.ParameterValues {
@@ -168,6 +170,7 @@ func (a *Admit) checkAppScopeInstance(appConf *v1alpha1.ApplicationConfiguration
 		for _, s := range v.ApplicationScopes {
 			scopeInstance, err := a.appConfigInformer.Lister().ApplicationConfigurations(appConf.Namespace).Get(s)
 			if err != nil {
+				klog.Infof("checkAppScopeInstance err: %v", err)
 				return err
 			}
 			if len(scopeInstance.Spec.Scopes) < 1 {
@@ -184,6 +187,7 @@ func (a *Admit) checkTrait(appConf *v1alpha1.ApplicationConfiguration) error {
 		for _, t := range v.Traits {
 			_, err := a.traitInformer.Lister().Traits(appConf.Namespace).Get(t.Name)
 			if err != nil {
+				klog.Infof("checkTrait err: %v", err)
 				return err
 			}
 			//TODO check trait properties in AppConfig really exist in that Trait spec
@@ -196,6 +200,7 @@ func (a *Admit) checkAppScope(appConf *v1alpha1.ApplicationConfiguration) error 
 	for _, v := range appConf.Spec.Scopes {
 		scope, err := a.scopeInformer.Lister().Scopes(appConf.Namespace).Get(v.Name)
 		if err != nil {
+			klog.Infof("checkAppScope err: %v", err)
 			return err
 		}
 		if scope.Spec.Type != v.Type {
